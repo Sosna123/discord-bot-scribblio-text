@@ -31,6 +31,21 @@ def addToFile(word, guildId):
         file.write(word.lower() + "\n")
         file.close()
         return 0
+    
+def removeFromFile(word, guildId):
+    list = getListOfWords(guildId)
+
+    file = open(f"./lists/{guildId}.txt", "w")
+
+    removed = 0
+
+    for wordInList in list:
+        if(wordInList != word.lower()):
+            file.write(wordInList + "\n")
+        else:
+            removed = 1
+    
+    return removed
 
 @client.event
 async def on_ready():
@@ -45,7 +60,7 @@ async def on_message(message):
     if message.content.startswith(f'{prefix}add'):
         messageWithoutAdd = message.content.split(" ")
         messageWithoutAdd.pop(0)
-        word = " ".join(messageWithoutAdd)
+        word = " ".join(messageWithoutAdd).lower()
 
         errors = addToFile(word, message.guild.id)
 
@@ -60,5 +75,17 @@ async def on_message(message):
     if message.content.startswith(f'{prefix}show'):
         wordsList = getListOfWords(message.guild.id)
         await message.channel.send(f"Your words (there is {len(wordsList)} of them): \n ```{",".join(wordsList)}```")
+
+    if message.content.startswith(f'{prefix}remove'):
+        messageWithoutAdd = message.content.split(" ")
+        messageWithoutAdd.pop(0)
+        word = " ".join(messageWithoutAdd).lower()
+
+        removed = removeFromFile(word, message.guild.id)
+
+        if(removed == 0):
+            await message.channel.send(f"{word} is not in the list!")
+        else:
+            await message.channel.send(f"Removed {word} from the list!")
 
 client.run(os.getenv('BOT_TOKEN'))
