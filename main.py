@@ -24,7 +24,7 @@ def addToFile(word, guildId):
 
     if(len(word) > 32):
         return 1
-    if(list.count(word.lower()) > 0):
+    elif(list.count(word.lower()) > 0):
         return 2
     else:
         file = open(f"./lists/{guildId}.txt", "a")
@@ -51,7 +51,7 @@ async def on_message(message):
 
         if(errors == 1):
             await message.channel.send(f"{word} has more than 32 characters!")
-        if(errors == 2):
+        elif(errors == 2):
             await message.channel.send(f"{word} has already been added!")
         else:
             await message.channel.send(f"Added {word} to the list!")
