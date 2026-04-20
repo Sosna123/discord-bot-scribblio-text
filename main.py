@@ -11,13 +11,16 @@ client = discord.Client(intents=intents)
 prefix = "\\"
 
 def getListOfWords(guildId):
-    file = open(f"./lists/{guildId}.txt", "r")
-    words = file.readlines()
+    try:
+        file = open(f"./lists/{guildId}.txt", "r")
+        words = file.readlines()
 
-    for i in range(len(words)):
-        words[i] = words[i].strip()
+        for i in range(len(words)):
+            words[i] = words[i].strip()
 
-    return words
+        return words
+    except:
+        return []
 
 def addToFile(word, guildId):
     list = getListOfWords(guildId)
@@ -56,6 +59,16 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    if message.content.startswith(f'{prefix}addMany'):
+        messageWithoutAdd = message.content.split(" ")
+        messageWithoutAdd.pop(0)
+        words = " ".join(messageWithoutAdd).lower()
+
+        for word in words.split(","):
+            word = addToFile(word, message.guild.id)
+
+        await message.channel.send(f"Added words to the list!")
+
 
     if message.content.startswith(f'{prefix}add'):
         messageWithoutAdd = message.content.split(" ")
@@ -71,10 +84,13 @@ async def on_message(message):
         else:
             await message.channel.send(f"Added {word} to the list!")
 
+   
 
     if message.content.startswith(f'{prefix}show'):
         wordsList = getListOfWords(message.guild.id)
+        
         await message.channel.send(f"Your words (there is {len(wordsList)} of them): \n ```{",".join(wordsList)}```")
+
 
     if message.content.startswith(f'{prefix}remove'):
         messageWithoutAdd = message.content.split(" ")
